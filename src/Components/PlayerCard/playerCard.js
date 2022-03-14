@@ -1,19 +1,26 @@
 import { useState } from "react";
 import styles from "./playerCard.module.css";
 import React from "react";
+import _ from "lodash";
 
 const PlayerCard = () => {
   const [players, setPlayers] = useState([
-    { score: 0, hand: 0, name: "Player 1" },
-    { score: 0, hand: 0, name: "Player 2" },
-    { score: 0, hand: 0, name: "Player 3" },
-    { score: 0, hand: 0, name: "Player 4" },
+    { id: 1, score: 0, hand: 0, name: "Player 1" }, // added id - MIKE P
+    { id: 2, score: 0, hand: 0, name: "Player 2" },
+    { id: 3, score: 0, hand: 0, name: "Player 3" },
+    { id: 4, score: 0, hand: 0, name: "Player 4" },
   ]);
   //const [score, setScore] = useState(0);
   const [name, setName] = useState("Player 1");
   const handleNameChange = (e, player) => {
+    // ------------------------------------------ Added this section - MIKE P
+    const newPlayers = _.cloneDeep(players);
+    newPlayers.filter((x) => x.id === player.id)[0].name = e.target.value;
+    setPlayers(newPlayers);
+    // --------------------------------------------
+
     //let newPlayers = [...players];
-    player.name = e.target.value;
+    // player.name = e.target.value;  // replaced this - MIKE P
     //setPlayers(newPlayers);
   };
 
@@ -65,7 +72,12 @@ const PlayerCard = () => {
       {players.map((player) => (
         <div className={styles.scoreCard}>
           <div className={styles.scoreCardUpper}>
-            <input type="text" className={styles.playerName} value={player.name} onChange={(e) => handleNameChange(e, player)} />
+            <input
+              type="text"
+              className={styles.playerName}
+              value={player.name}
+              onChange={(e) => handleNameChange(e, player)}
+            />
             <h1 className={styles.score}>{player.score}</h1>
           </div>
           <div className={styles.scoreCardLower}>
