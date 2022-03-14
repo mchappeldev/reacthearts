@@ -1,101 +1,113 @@
 import { useState } from "react";
 import styles from "./playerCard.module.css";
 import React from "react";
-import _ from "lodash";
+
+let hand = 1;
+var scoreBook = new Map();
 
 const PlayerCard = () => {
-  const [players, setPlayers] = useState([
-    { id: 1, score: 0, hand: 0, name: "Player 1" }, // added id - MIKE P
-    { id: 2, score: 0, hand: 0, name: "Player 2" },
-    { id: 3, score: 0, hand: 0, name: "Player 3" },
-    { id: 4, score: 0, hand: 0, name: "Player 4" },
-  ]);
-  //const [score, setScore] = useState(0);
-  const [name, setName] = useState("Player 1");
-  const handleNameChange = (e, player) => {
-    // ------------------------------------------ Added this section - MIKE P
-    const newPlayers = _.cloneDeep(players);
-    newPlayers.filter((x) => x.id === player.id)[0].name = e.target.value;
-    setPlayers(newPlayers);
-    // --------------------------------------------
+  const [players, setPlayers] = useState({
+    p1: "Player 1",
+    p2: "Player 2",
+    p3: "Player 3",
+    p4: "Player 4",
+  });
+  const [scores, setScores] = useState({
+    p1: 0,
+    p2: 0,
+    p3: 0,
+    p4: 0,
+  });
+  const [hands, setHands] = useState({
+    p1: 0,
+    p2: 0,
+    p3: 0,
+    p4: 0,
+  });
 
-    //let newPlayers = [...players];
-    // player.name = e.target.value;  // replaced this - MIKE P
-    //setPlayers(newPlayers);
+  const handleNameChange = (e, player) => {
+    setPlayers({ ...players, [player]: e.target.value });
+  };
+  const handleHandChange = (e, player) => {
+    setHands({ ...hands, [player]: parseInt(e.target.value) });
   };
 
   const updateScore = () => {
     //Add the current hand to the players score.
-    players[0].score += players[0].hand;
-    players[1].score += players[1].hand;
-    players[2].score += players[2].hand;
-    players[3].score += players[3].hand;
+    let updatedScores = { ...scores };
+    updatedScores.p1 += hands.p1;
+    updatedScores.p2 += hands.p2;
+    updatedScores.p3 += hands.p3;
+    updatedScores.p4 += hands.p4;
+    setScores(updatedScores);
 
     //record the current score in the scorebook
-    let currentHand = [players[0].score, players[1].score, players[2].score, players[3].score];
-    //scoreBook.set(hand, currentHand);
-    // scoreBook = scoreBook;
-    // hand++;
+    let currentHand = [hands.p1, hands.p2, hands.p3, hands.p4];
+    scoreBook.set(hand, currentHand);
+    hand++;
 
     //reset
-    // resetHand();
+    resetHand();
   };
 
-  const scoreButtons = (player, amount) => {
+  const resetHand = () => {
+    setHands({ p1: 0, p2: 0, p3: 0, p4: 0 });
+  };
+
+  const handScoreButtons = (player, amount) => {
     //Shoot the Moon
     if (amount == 26) {
-      for (var i in players) {
-        if (players[i] != player) {
-          players[i].hand = 26;
+      let updatedHands = { ...hands };
+      for (let hand in updatedHands) {
+        if (hand != player) {
+          updatedHands = { ...updatedHands, [hand]: 26 };
         } else {
-          players[i].hand = 0;
+          updatedHands = { ...updatedHands, [hand]: 0 };
         }
       }
-      //updateScore();
-      //resetHand();
+      setHands(updatedHands);
+      updateScore();
       return;
     }
-
     //Evaluate if the amount of points remaining will allow the score action.
     //if (player.hand <= pointsRemaining(player.hand) - amount) {
     //const updatedScore = players.map((player) => (player.score = player.score + amount));
-
-    let newPlayers = [...players];
-    player.hand = player.hand + amount;
-    setPlayers(newPlayers);
-
+    //old    // let newPlayers = [...players];
+    // player.hand = player.hand + amount;
+    // setPlayers(newPlayers);
+    // let updatedScore = 0;
+    // updatedScore = players[player].hand + amount;
+    // setPlayerHelper(player, "hand", updatedScore);
     //updateHands();
+    setHands({ ...hands, [player]: hands[player] + amount });
   };
 
   return (
     <div className={styles.main}>
-      {players.map((player) => (
+      {Object.keys(players).map((player) => (
         <div className={styles.scoreCard}>
           <div className={styles.scoreCardUpper}>
-            <input
-              type="text"
-              className={styles.playerName}
-              value={player.name}
-              onChange={(e) => handleNameChange(e, player)}
-            />
-            <h1 className={styles.score}>{player.score}</h1>
+            <input type="text" className={styles.playerName} value={players[player]} onChange={(e) => handleNameChange(e, player)} />
+            <h1 className={styles.score}>{scores[player]}</h1>
           </div>
           <div className={styles.scoreCardLower}>
-            <button className={styles.scoreButton}>Moon</button>
-            <button onClick={() => scoreButtons(player, -1)} className={styles.scoreButton}>
+            <button onClick={() => handScoreButtons(player, 26)} className={styles.scoreButton}>
+              Moon
+            </button>
+            <button onClick={() => handScoreButtons(player, -1)} className={styles.scoreButton}>
               -1
             </button>
-            <input type="number" value={player.hand} />
-            <button onClick={() => scoreButtons(player, 1)} className={styles.scoreButton}>
+            <input type="number" value={hands[player]} onChange={(e) => handleHandChange(e, player)} />
+            <button onClick={() => handScoreButtons(player, 1)} className={styles.scoreButton}>
               +1
             </button>
-            <button onClick={() => scoreButtons(player, 5)} className={styles.scoreButton}>
+            <button onClick={() => handScoreButtons(player, 5)} className={styles.scoreButton}>
               +5
             </button>
           </div>
         </div>
       ))}
-      <button onClick={() => updateScore()}>Reset</button>
+      <button onClick={() => updateScore()}>submit!</button>
     </div>
   );
 };
