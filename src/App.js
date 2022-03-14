@@ -6,15 +6,10 @@ import ScoreBoard from "./Components/ScoreBoard/scoreBoard";
 import "./App.css";
 
 function App() {
-  const playerArr = [...Array(4).keys()];
   return (
     <div className="App">
       <NavBar />
-      <div class="main">
-        {playerArr.map((player) => (
-          <PlayerCard key={player} />
-        ))}
-      </div>
+      <PlayerCard />
       <ControlPanel />
       <ScoreBoard />
     </div>
